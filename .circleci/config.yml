@@ -5,22 +5,29 @@ version: 2.1
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
-  say-hello:
-    # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
-    # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
+    # Exercise: Config and Deployment
+  configure_infrastructure: 
     docker:
-      - image: cimg/base:stable
-    # Add steps to the job
-    # See: https://circleci.com/docs/2.0/configuration-reference/#steps
+      - image: python:3.7-alpine3.11
     steps:
       - checkout
+      - add_ssh_keys:
+              # You can get this ID in the section where you registered the SSH Key
+              fingerprints: ["b5:ef:48:4a:93:20:46:07:2c:da:2e:08:a3:59:fd:68"] 
       - run:
-          name: "Say hello"
-          command: "echo Hello, World!"
+          name: Install Ansible
+          command: |
+            # Install Ansible
+            apk add --update ansible
 
+      - run:
+          name: Run Playbook and Configure server
+          command: |
+            # Your command
+            ansible-playbook -i inventory main.yml
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
-  say-hello-workflow:
+  config-infra-workflow:
     jobs:
-      - say-hello
+      - configure_infrastructure
